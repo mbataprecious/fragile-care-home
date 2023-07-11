@@ -1,4 +1,5 @@
 import './style.css'
+import "./scss/tailwind.scss"
 
 /* Template Name: Techwind - Multipurpose Tailwind CSS Landing Page Template
    Author: Shreethemes
@@ -45,6 +46,7 @@ import './style.css'
  /*********************/
  /* Toggle Menu */
  /*********************/
+ document.getElementById("isToggle").onclick=toggleMenu
  function toggleMenu() {
      document.getElementById('isToggle').classList.toggle('open');
      var isOpen = document.getElementById('navigation')
@@ -54,6 +56,8 @@ import './style.css'
          isOpen.style.display = "block";
      }
  };
+
+
  /*********************/
  /*    Menu Active    */
  /*********************/
@@ -270,14 +274,16 @@ import './style.css'
  /*      Contact Js       */
  /*************************/
  
- try {
+
      function validateForm() {
          var name = document.forms["myForm"]["name"].value;
          var email = document.forms["myForm"]["email"].value;
          var subject = document.forms["myForm"]["subject"].value;
          var comments = document.forms["myForm"]["comments"].value;
+         console.log({name,email,subject,comments})
          document.getElementById("error-msg").style.opacity = 0;
          document.getElementById('error-msg').innerHTML = "";
+         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
          if (name == "" || name == null) {
              document.getElementById('error-msg').innerHTML = "<div class='alert alert-warning error_message'>*Please enter a Name*</div>";
              fadeIn();
@@ -285,6 +291,11 @@ import './style.css'
          }
          if (email == "" || email == null) {
              document.getElementById('error-msg').innerHTML = "<div class='alert alert-warning error_message'>*Please enter a Email*</div>";
+             fadeIn();
+             return false;
+         }
+         if (!emailRegex.test(email)) {
+             document.getElementById('error-msg').innerHTML = "<div class='alert alert-warning error_message'>*Please enter a valid Email address*</div>";
              fadeIn();
              return false;
          }
@@ -313,7 +324,55 @@ import './style.css'
          xhttp.send("name=" + name + "&email=" + email + "&subject=" + subject + "&comments=" + comments);
          return false;
      }
- 
+
+ const myForm= document.getElementById("myForm");
+
+
+ myForm.onsubmit=(e)=>{
+e.preventDefault()
+let isValid=validateForm()
+if(isValid){
+    var name = document.forms["myForm"]["name"].value;
+    var email = document.forms["myForm"]["email"].value;
+    var subject = document.forms["myForm"]["subject"].value;
+    var comments = document.forms["myForm"]["comments"].value;
+    const submitButton=document.getElementById("submit")
+
+    const url = 'https://www.advisor.carissamariabarney.com/api/sendform'; // Replace with your API endpoint URL
+
+// Data to send in the request body
+const data = {name,email,subject,comments}
+
+// Options for the Fetch API request
+const options = {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(data)
+};
+submitButton.disabled = true;
+let oldBtnContent=submitButton.textContent
+submitButton.textContent="loading..."
+submitButton.classList.add("opacity-70")
+// Make the POST request
+fetch(url, options)
+  .then(response => response.json())
+  .then(data => {
+    // Handle the response data
+    console.log(data);
+  })
+  .catch(error => {
+    // Handle any errors
+    console.error('Error:', error);
+  }).finally(()=>{
+    submitButton.disabled = false;
+    submitButton.textContent=oldBtnContent
+    submitButton.classList.remove("opacity-70")
+  });
+}
+ }
+
      function fadeIn() {
          var fade = document.getElementById("error-msg");
          var opacity = 0;
@@ -326,6 +385,3 @@ import './style.css'
              }
          }, 200);
      }
- } catch (error) {
-     
- }
